@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: etcd-browser
+    labels:
+        app: etcd
+spec:
+    ports:
+        - port: 8000
+    selector:
+        app: etcd
+        tier: browser
+    type: LoadBalancer
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata: 
+    name: etcd-browser
+    labels: 
+      app: etcd
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: etcd
+            tier: browser
+    template: 
+        metadata:
+            labels:  
+                app: etcd
+                tier: browser
+        spec:
+            containers:
+                - name: etcd-browser
+                  image: zigakern/etcd-browser
+                  env:
+                    - name: ETCD_HOST
+                      value: etcd
+                    - name: ETCD_PORT
+                      value: "2379"
+                  ports:
+                    - containerPort: 8000
+                      name: etcd-browser
+                      protocol: TCP
